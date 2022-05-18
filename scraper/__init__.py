@@ -49,6 +49,7 @@ def store_following(username):
 					link = crud.creator_link.create(db, obj_in=link_in)
 
 @click.command
+@click.argument('username')
 def test(username):
 	"""Testing"""
 	for db in session.get_session():

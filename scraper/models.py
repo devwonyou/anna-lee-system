@@ -42,22 +42,21 @@ class CreatorInDBBase(CreatorBase, PKModel):
   pass
 
 class Creator(CreatorInDBBase, table=True):
+  # https://github.com/tiangolo/sqlmodel/issues/89
+  
   following_list: List["Creator"] = Relationship(
     back_populates="follower_list",
     link_model=CreatorLink,
     sa_relationship_kwargs=dict(
-      primaryjoin="creator.id==creatorlink.follower_id",
-      secondaryjoin="creator.id==creatorlink.followed_id",
+      primaryjoin="Creator.id==CreatorLink.follower_id",
+      secondaryjoin="Creator.id==CreatorLink.followed_id",
     ),
   )
   follower_list: List["Creator"] = Relationship(
     back_populates="following_list",
     link_model=CreatorLink,
     sa_relationship_kwargs=dict(
-      primaryjoin="creator.id==creatorlink.followed_id",
-      secondaryjoin="creator.id==creatorlink.follower_id",
+      primaryjoin="Creator.id==CreatorLink.followed_id",
+      secondaryjoin="Creator.id==CreatorLink.follower_id",
     ),
   )
-
-CreatorLink.update_forward_refs()
-Creator.update_forward_refs()

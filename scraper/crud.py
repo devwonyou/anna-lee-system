@@ -56,6 +56,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 		else:
 			update_data = obj_in.dict(exclude_unset=True)
 		# NOTE (awaiting developer updates): exclude_unset does not work in SQLModels but does work in Pydantic Models
+		# https://github.com/tiangolo/sqlmodel/issues/87
 		update_data = {k: v for k, v in update_data.items() if v is not None}
 		for field in obj_data:
 			if field in update_data: 
@@ -79,10 +80,10 @@ class CRUDCreatorLink(CRUDBase[CreatorLink, CreatorLinkCreate, CreatorLinkUpdate
 		followed_id: int
 	) -> Optional[CreatorLink]:
 		query = ( 
-			db.query(self.model)
+			db.query(CreatorLink)
 			.filter(
-				self.model.follower_id == follower_id,
-				self.model.followed_id == followed_id
+				CreatorLink.follower_id == follower_id,
+				CreatorLink.followed_id == followed_id
 				)
 			.first()
 		)
@@ -90,8 +91,8 @@ class CRUDCreatorLink(CRUDBase[CreatorLink, CreatorLinkCreate, CreatorLinkUpdate
 
 class CRUDCreator(CRUDBase[Creator, CreatorCreate, CreatorUpdate]):
 	def get_by_username(self, db: Session, username: str) -> Optional[Creator]:
-		query = db.query(self.model).filter(self.model.username == username).first()
-		return query
+		return db.query(Creator).filter(Creator.username == username).first()
+		
 
 creator_link = CRUDCreatorLink(CreatorLink)
 creator = CRUDCreator(Creator)
